@@ -1,0 +1,105 @@
+table DimDate
+	lineageTag: b9630dd9-1414-4622-b6c3-ca7fd8dd73e4
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: edd91bb1-699d-4780-9204-52e79da4684b
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: adabd1a9-a3f5-41e3-814a-32bef62d0f82
+			defaultHierarchy: LocalDateTable_3a2b7727-66ad-4454-add1-2c26223dcc8e.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0000
+		lineageTag: 9a07d674-e18f-4163-8b14-bf814449dd6d
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo
+		dataType: int64
+		formatString: 00
+		lineageTag: 2f18dcd5-a352-4c61-a2e8-1fa904cdd4d0
+		summarizeBy: sum
+		sourceColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		dataType: string
+		lineageTag: 9cae2639-83d2-4070-a83c-81e98b0c2bd5
+		summarizeBy: none
+		sourceColumn: MonthName
+
+	column MonthShort
+		dataType: string
+		lineageTag: dbf29b12-b2ad-47fe-928b-a04e31623684
+		summarizeBy: none
+		sourceColumn: MonthShort
+
+	column MonthYear
+		dataType: string
+		lineageTag: e825560a-f90b-447c-a169-ba314d580e74
+		summarizeBy: none
+		sourceColumn: MonthYear
+		sortByColumn: YearMonthKey
+
+	column YearMonthKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a3db2ed-8501-49bc-981e-5193a06d86c2
+		summarizeBy: count
+		sourceColumn: YearMonthKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FinancialYear
+		dataType: string
+		lineageTag: 59698960-45f3-4f24-b16a-d6ddf9b4d563
+		summarizeBy: none
+		sourceColumn: FinancialYear
+
+	column FYQuarter
+		dataType: string
+		lineageTag: 61b1e365-f9f9-4959-b70a-7cd32be19f90
+		summarizeBy: none
+		sourceColumn: FYQuarter
+
+	column MonthInFY
+		dataType: int64
+		formatString: 00
+		lineageTag: c229d8d2-0854-4126-b469-6fbea7032031
+		summarizeBy: sum
+		sourceColumn: MonthInFY
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate-Partition = m
+		mode: import
+		source =
+				let
+				    StartDate = #date(2016, 4, 1),
+				    MonthCount = 126,
+				    MonthList = List.Generate(() => 0, each _ < MonthCount, each _ + 1, each Date.AddMonths(StartDate, _)),
+				    #"Converted to Table" = Table.FromList(MonthList, Splitter.SplitByNothing(), {"Date"}, null, ExtraValues.Error),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"Date", type date}}),
+				    #"Added Year" = Table.AddColumn(#"Changed Type", "Year", each Date.Year([Date]), Int64.Type),
+				    #"Added MonthNo" = Table.AddColumn(#"Added Year", "MonthNo", each Date.Month([Date]), Int64.Type),
+				    #"Added MonthName" = Table.AddColumn(#"Added MonthNo", "MonthName", each Date.MonthName([Date]), type text),
+				    #"Added MonthShort" = Table.AddColumn(#"Added MonthName", "MonthShort", each Date.ToText([Date], "MMM"), type text),
+				    #"Added MonthYear" = Table.AddColumn(#"Added MonthShort", "MonthYear", each Date.ToText([Date], "MMM yyyy"), type text),
+				    #"Added YearMonthKey" = Table.AddColumn(#"Added MonthYear", "YearMonthKey", each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type),
+				    #"Added FinancialYear" = Table.AddColumn(#"Added YearMonthKey", "FinancialYear", each if Date.Month([Date]) >= 4 then Text.From(Date.Year([Date])) & "-" & Text.End(Text.From(Date.Year([Date]) + 1), 2) else Text.From(Date.Year([Date]) - 1) & "-" & Text.End(Text.From(Date.Year([Date])), 2), type text),
+				    #"Added FYQuarter" = Table.AddColumn(#"Added FinancialYear", "FYQuarter", each if List.Contains({4,5,6}, Date.Month([Date])) then "Q1" else if List.Contains({7,8,9}, Date.Month([Date])) then "Q2" else if List.Contains({10,11,12}, Date.Month([Date])) then "Q3" else "Q4", type text),
+				    #"Added MonthInFY" = Table.AddColumn(#"Added FYQuarter", "MonthInFY", each if Date.Month([Date]) >= 4 then Date.Month([Date]) - 3 else Date.Month([Date]) + 9, Int64.Type)
+				in
+				    #"Added MonthInFY"
+

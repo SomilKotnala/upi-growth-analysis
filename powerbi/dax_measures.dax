@@ -1,0 +1,165 @@
+/*
+===============================================================================
+UPI GROWTH ANALYSIS — CORE DAX MEASURES SPECIFICATION
+Project: D:\upi-growth-analysis\powerbi\upi_growth_analysis.pbip
+Compatibility: Power BI Desktop / Analysis Services Tabular Model
+===============================================================================
+*/
+
+// --- 1. CORE TRANSACTION AGGREGATES ---
+
+[Total Volume (Mn)] = 
+SUM(MonthlyMetrics[volume_mn])
+/* Format: #,##0.00 | Total transaction volume in millions */
+
+[Total Value (Cr INR)] = 
+SUM(MonthlyMetrics[value_cr])
+/* Format: ₹#,##0.00 | Total transaction value in crore rupees */
+
+[Weighted Avg Ticket Size (INR)] = 
+VAR _Vol = [Total Volume (Mn)]
+VAR _Val = [Total Value (Cr INR)]
+RETURN
+    IF(
+        _Vol > 0,
+        DIVIDE(_Val, _Vol) * 10,
+        BLANK()
+    )
+/* Format: ₹#,##0.00 | Weighted average transaction size in INR */
+
+
+// --- 2. LATEST MONTH KPIS (RESOLVES TO SEPTEMBER 2026) ---
+
+[Latest Bank Count] = 
+VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        MAX(MonthlyMetrics[bank_count]),
+        MonthlyMetrics[month] = _LatestDate
+    )
+/* Format: #,##0 | Latest bank count (756 member banks) */
+
+[Latest Month Volume (Mn)] = 
+VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        [Total Volume (Mn)],
+        MonthlyMetrics[month] = _LatestDate
+    )
+/* Format: #,##0.00 | Latest month volume (24,068.38M) */
+
+[Latest Month Value (Cr INR)] = 
+VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        [Total Value (Cr INR)],
+        MonthlyMetrics[month] = _LatestDate
+    )
+/* Format: ₹#,##0.00 | Latest month value (₹2,937,396.67 Cr) */
+
+[Latest Month Volume YoY Growth %] = 
+VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        SELECTEDVALUE(MonthlyMetrics[yoy_volume_growth_pct]),
+        MonthlyMetrics[month] = _LatestDate
+    ) / 100
+/* Format: 0.00% | Latest YoY volume growth (+22.59%) */
+
+[Latest Month Value YoY Growth %] = 
+VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        SELECTEDVALUE(MonthlyMetrics[yoy_value_growth_pct]),
+        MonthlyMetrics[month] = _LatestDate
+    ) / 100
+/* Format: 0.00% | Latest YoY value growth (+17.98%) */
+
+
+// --- 3. FINANCIAL-YEAR LEVEL MEASURES ---
+
+[FY Volume (Mn)] = 
+SUM(FinancialYearMetrics[total_volume_mn])
+/* Format: #,##0.00 | Aggregated financial-year volume */
+
+[FY Value (Cr INR)] = 
+SUM(FinancialYearMetrics[total_value_cr])
+/* Format: ₹#,##0.00 | Aggregated financial-year value */
+
+[FY Completeness Status] = 
+IF(
+    HASONEVALUE(DimFinancialYear[FinancialYear]),
+    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+    RETURN IF(_IsComp, "Complete (12 Months)", "Incomplete (6 Months)"),
+    "Multiple Financial Years"
+)
+/* String status clearly tagging partial FY 2026-27 */
+
+[FY Volume YoY Growth %] = 
+IF(
+    HASONEVALUE(DimFinancialYear[FinancialYear]),
+    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+    VAR _Growth = SELECTEDVALUE(FinancialYearMetrics[yoy_volume_growth_pct])
+    RETURN
+        IF(_IsComp && NOT(ISBLANK(_Growth)), _Growth / 100, BLANK()),
+    BLANK()
+)
+/* Format: 0.00% | Financial year volume growth percentage (blank for FY 26-27 or baseline) */
+
+[FY Value YoY Growth %] = 
+IF(
+    HASONEVALUE(DimFinancialYear[FinancialYear]),
+    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+    VAR _Growth = SELECTEDVALUE(FinancialYearMetrics[yoy_value_growth_pct])
+    RETURN
+        IF(_IsComp && NOT(ISBLANK(_Growth)), _Growth / 100, BLANK()),
+    BLANK()
+)
+/* Format: 0.00% | Financial year value growth percentage (blank for FY 26-27 or baseline) */
+
+
+// --- 4. DISPLAY UNIT & TIME-SERIES MEASURES (QA3 & PAGE 2) ---
+
+[Total Volume (Bn)] = 
+DIVIDE([Total Volume (Mn)], 1000)
+/* Format: #,##0.00 | Total volume in billions of transactions */
+
+[Total Value (Lakh Cr INR)] = 
+DIVIDE([Total Value (Cr INR)], 100000)
+/* Format: ₹#,##0.00 | Total turnover in lakh crore Indian rupees */
+
+[Monthly Volume (Bn)] = 
+DIVIDE(SUM(MonthlyMetrics[volume_mn]), 1000)
+/* Format: #,##0.00 | Monthly volume in billions */
+
+[Monthly Value (Lakh Cr INR)] = 
+DIVIDE(SUM(MonthlyMetrics[value_cr]), 100000)
+/* Format: ₹#,##0.00 | Monthly turnover in lakh crore */
+
+[Monthly Volume YoY Growth %] = 
+VAR _Val = AVERAGE(MonthlyMetrics[yoy_volume_growth_pct])
+RETURN
+    IF(NOT(ISBLANK(_Val)), DIVIDE(_Val, 100), BLANK())
+/* Format: 0.00% | Monthly YoY volume growth for time-series pulse */
+
+[Monthly Value YoY Growth %] = 
+VAR _Val = AVERAGE(MonthlyMetrics[yoy_value_growth_pct])
+RETURN
+    IF(NOT(ISBLANK(_Val)), DIVIDE(_Val, 100), BLANK())
+/* Format: 0.00% | Monthly YoY value growth for time-series pulse */
+
+[Launch Bank Count] = 
+VAR _EarliestDate = CALCULATE(MIN(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+RETURN
+    CALCULATE(
+        MAX(MonthlyMetrics[bank_count]),
+        MonthlyMetrics[month] = _EarliestDate
+    )
+/* Format: #,##0 | April 2016 launch baseline bank count (21 banks) */
+
+[Network Expansion Multiple] = 
+VAR _Latest = [Latest Bank Count]
+VAR _Launch = [Launch Bank Count]
+RETURN
+    IF(_Launch > 0, DIVIDE(_Latest, _Launch), BLANK())
+/* Format: 0.0"x" | Network expansion ratio from launch baseline (36.0x) */

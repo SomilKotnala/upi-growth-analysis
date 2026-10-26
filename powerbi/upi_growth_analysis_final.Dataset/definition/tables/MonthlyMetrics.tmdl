@@ -1,0 +1,324 @@
+table MonthlyMetrics
+	lineageTag: ab908c46-ab91-4f8c-b80f-f7c52a595f45
+
+	/// Total transaction volume across the selected context in millions of transactions.
+	measure 'Total Volume (Mn)' = SUM(MonthlyMetrics[volume_mn])
+		formatString: #,##0.00
+		lineageTag: d0a37719-3fbe-4af2-9bb3-b8f767d75ad6
+
+	/// Total transaction value across the selected context in crore Indian rupees.
+	measure 'Total Value (Cr INR)' = SUM(MonthlyMetrics[value_cr])
+		formatString: ₹#,##0.00
+		lineageTag: 8c183e68-10ca-447d-8530-ad779ffea265
+
+	/// Weighted average transaction size in INR: (Total Value Cr / Total Volume Mn) * 10.
+	measure 'Weighted Avg Ticket Size (INR)' =
+			VAR _Vol = [Total Volume (Mn)]
+			VAR _Val = [Total Value (Cr INR)]
+			RETURN
+			    IF(_Vol > 0, DIVIDE(_Val, _Vol) * 10, BLANK())
+		formatString: ₹#,##0.00
+		lineageTag: e4bc0aea-1eab-4c28-8a0d-d639e54fef67
+
+	/// Latest verified number of live member banks on the UPI network (as of September 2026).
+	measure 'Latest Bank Count' =
+			VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        MAX(MonthlyMetrics[bank_count]),
+			        MonthlyMetrics[month] = _LatestDate
+			    )
+		formatString: #,##0
+		lineageTag: 8aef819b-ed41-4140-b737-af218b88f197
+
+	/// Transaction volume for the most recent available month (September 2026: 24,068.38M).
+	measure 'Latest Month Volume (Mn)' =
+			VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        [Total Volume (Mn)],
+			        MonthlyMetrics[month] = _LatestDate
+			    )
+		formatString: #,##0.00
+		lineageTag: 24c7484b-70eb-4402-9150-495d7267e78c
+
+	/// Transaction value for the most recent available month (September 2026: ₹2,937,396.67 Cr).
+	measure 'Latest Month Value (Cr INR)' =
+			VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        [Total Value (Cr INR)],
+			        MonthlyMetrics[month] = _LatestDate
+			    )
+		formatString: ₹#,##0.00
+		lineageTag: da3d0dd7-055b-4dad-97da-62fe6dd1ba79
+
+	/// Year-over-year volume growth for the latest month (+22.59% for September 2026).
+	measure 'Latest Month Volume YoY Growth %' =
+			VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        SELECTEDVALUE(MonthlyMetrics[yoy_volume_growth_pct]),
+			        MonthlyMetrics[month] = _LatestDate
+			    ) / 100
+		formatString: 0.00%
+		lineageTag: 81a5dd77-be29-4201-947e-32a8c89b6a51
+
+	/// Year-over-year value growth for the latest month (+17.98% for September 2026).
+	measure 'Latest Month Value YoY Growth %' =
+			VAR _LatestDate = CALCULATE(MAX(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        SELECTEDVALUE(MonthlyMetrics[yoy_value_growth_pct]),
+			        MonthlyMetrics[month] = _LatestDate
+			    ) / 100
+		formatString: 0.00%
+		lineageTag: 6d205c3d-769e-4669-9a25-bd8732b2f369
+
+	/// Aggregated transaction volume from financial-year metrics table in millions.
+	measure 'FY Volume (Mn)' = SUM(FinancialYearMetrics[total_volume_mn])
+		formatString: #,##0.00
+		lineageTag: 73386059-24a9-44e0-9a0c-d3c6fcb0a0a0
+
+	/// Aggregated transaction value from financial-year metrics table in crore rupees.
+	measure 'FY Value (Cr INR)' = SUM(FinancialYearMetrics[total_value_cr])
+		formatString: ₹#,##0.00
+		lineageTag: c2bb8a59-4ea1-4bfa-b975-c0adc3da9642
+
+	/// Indicates whether the filtered financial year has a complete 12-month baseline or partial data.
+	measure 'FY Completeness Status' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+			    RETURN IF(_IsComp, "Complete (12 Months)", "Incomplete (6 Months)"),
+			    "Multiple Financial Years"
+			)
+		lineageTag: 688dca2b-0190-425e-99fe-836a32ca5ad3
+
+	/// Financial year volume YoY growth percentage. Returns blank for incomplete FY 2026-27 or baseline years.
+	measure 'FY Volume YoY Growth %' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+			    VAR _Growth = SELECTEDVALUE(FinancialYearMetrics[yoy_volume_growth_pct])
+			    RETURN
+			        IF(_IsComp && NOT(ISBLANK(_Growth)), _Growth / 100, BLANK()),
+			    BLANK()
+			)
+		formatString: 0.00%
+		lineageTag: c2c87157-0d4b-4477-bd34-16c33350128c
+
+	/// Financial year value YoY growth percentage. Returns blank for incomplete FY 2026-27 or baseline years.
+	measure 'FY Value YoY Growth %' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    VAR _IsComp = SELECTEDVALUE(DimFinancialYear[IsComplete])
+			    VAR _Growth = SELECTEDVALUE(FinancialYearMetrics[yoy_value_growth_pct])
+			    RETURN
+			        IF(_IsComp && NOT(ISBLANK(_Growth)), _Growth / 100, BLANK()),
+			    BLANK()
+			)
+		formatString: 0.00%
+		lineageTag: 5ece76d8-d365-4a6b-8f85-ac5af8b4f1b2
+
+	/// Total cumulative transaction volume in billions of transactions: [Total Volume (Mn)] / 1000.
+	measure 'Total Volume (Bn)' = DIVIDE([Total Volume (Mn)], 1000)
+		formatString: #,##0.00
+		lineageTag: e61a2931-7bfa-4c8d-8153-29a391a82201
+
+	/// Total cumulative transaction value in lakh crore Indian rupees: [Total Value (Cr INR)] / 100000.
+	measure 'Total Value (Lakh Cr INR)' = DIVIDE([Total Value (Cr INR)], 100000)
+		formatString: ₹#,##0.00
+		lineageTag: f84c2018-912c-4902-8356-9b5502a11b33
+
+	/// Monthly transaction volume in billions of transactions for trend analysis.
+	measure 'Monthly Volume (Bn)' = DIVIDE(SUM(MonthlyMetrics[volume_mn]), 1000)
+		formatString: #,##0.00
+		lineageTag: 3c72b145-3db9-4672-8854-8c81ad675401
+
+	/// Monthly transaction value in lakh crore Indian rupees for trend analysis.
+	measure 'Monthly Value (Lakh Cr INR)' = DIVIDE(SUM(MonthlyMetrics[value_cr]), 100000)
+		formatString: ₹#,##0.00
+		lineageTag: 5b4e892c-6239-44e2-9b24-4f81a7bb7812
+
+	/// Monthly Year-over-Year transaction volume growth percentage for time-series analysis.
+	measure 'Monthly Volume YoY Growth %' =
+			VAR _Val = AVERAGE(MonthlyMetrics[yoy_volume_growth_pct])
+			RETURN
+			    IF(NOT(ISBLANK(_Val)), DIVIDE(_Val, 100), BLANK())
+		formatString: 0.00%
+		lineageTag: a7e30129-3b91-4cf5-99d8-82e1e0a29301
+
+	/// Monthly Year-over-Year transaction value growth percentage for time-series analysis.
+	measure 'Monthly Value YoY Growth %' =
+			VAR _Val = AVERAGE(MonthlyMetrics[yoy_value_growth_pct])
+			RETURN
+			    IF(NOT(ISBLANK(_Val)), DIVIDE(_Val, 100), BLANK())
+		formatString: 0.00%
+		lineageTag: b8f41239-4c02-4df6-aa09-93f2f1b30412
+
+	/// Number of live member banks at UPI launch baseline (April 2016: 21 banks).
+	measure 'Launch Bank Count' =
+			VAR _EarliestDate = CALCULATE(MIN(MonthlyMetrics[month]), REMOVEFILTERS(MonthlyMetrics))
+			RETURN
+			    CALCULATE(
+			        MAX(MonthlyMetrics[bank_count]),
+			        MonthlyMetrics[month] = _EarliestDate
+			    )
+		formatString: #,##0
+		lineageTag: c9a52341-5d13-4ef7-bb12-04a3e2c41523
+
+	/// Observed network expansion ratio from launch baseline (April 2016: 21 banks) to latest observation (September 2026: 756 banks = 36.0x).
+	measure 'Network Expansion Multiple' =
+			VAR _Latest = [Latest Bank Count]
+			VAR _Launch = [Launch Bank Count]
+			RETURN
+			    IF(_Launch > 0, DIVIDE(_Latest, _Launch), BLANK())
+		formatString: 0.0"x"
+		lineageTag: da273412-6e24-4fa8-cc23-15b4f3d52634
+
+	column month
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: 7e17a558-45af-45e1-a42e-75be15d4dc73
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column bank_count
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 558d1881-b8d5-4615-bfc4-6f1d35eb7184
+		summarizeBy: none
+		sourceColumn: bank_count
+
+	column volume_mn
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: ec89724e-24d8-45bc-b168-31d768156857
+		summarizeBy: sum
+		sourceColumn: volume_mn
+
+	column value_cr
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: d9cc5735-65aa-4a67-b242-7b5ea024884b
+		summarizeBy: sum
+		sourceColumn: value_cr
+
+	column avg_ticket_size_inr
+		dataType: double
+		formatString: ₹#,##0.00
+		lineageTag: f21eddfa-f99b-4066-b17c-7985d76a3b5d
+		summarizeBy: none
+		sourceColumn: avg_ticket_size_inr
+
+	column prev_year_volume_mn
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 9119ac6d-2389-48ac-8f9c-4ae97bf0da8c
+		summarizeBy: sum
+		sourceColumn: prev_year_volume_mn
+
+	column prev_year_value_cr
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: e287db0a-20b2-47ac-9ec5-b0cb3fe31dec
+		summarizeBy: sum
+		sourceColumn: prev_year_value_cr
+
+	column yoy_volume_growth_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: aaba4365-5d76-49fa-b100-4ccf4cb9379a
+		summarizeBy: none
+		sourceColumn: yoy_volume_growth_pct
+
+	column yoy_value_growth_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: 5d055698-a25c-4f78-a868-881014f0cfd5
+		summarizeBy: none
+		sourceColumn: yoy_value_growth_pct
+
+	partition MonthlyMetrics-Partition = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(EdaDirectory & "\monthly_metrics.csv"),[Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"month", type date}, {"bank_count", Int64.Type}, {"volume_mn", type number}, {"value_cr", type number}, {"avg_ticket_size_inr", type number}, {"prev_year_volume_mn", type number}, {"prev_year_value_cr", type number}, {"yoy_volume_growth_pct", type number}, {"yoy_value_growth_pct", type number}})
+				in
+				    #"Changed Type"
+
+
+	/// Financial year transaction volume in billions: [FY Volume (Mn)] / 1000
+	measure 'FY Volume (Bn)' = DIVIDE([FY Volume (Mn)], 1000)
+		formatString: #,##0.00
+		lineageTag: a7b8c9d0-1234-5678-9abc-def012345678
+
+	/// Financial year transaction value in lakh crore INR: [FY Value (Cr INR)] / 100000
+	measure 'FY Value (Lakh Cr INR)' = DIVIDE([FY Value (Cr INR)], 100000)
+		formatString: #,##0.00
+		lineageTag: b8c9d0e1-2345-6789-abcd-ef0123456789
+
+	/// Financial year weighted average ticket size in INR
+	measure 'FY Weighted Avg Ticket Size (INR)' = DIVIDE([FY Value (Cr INR)], [FY Volume (Mn)]) * 10
+		formatString: ₹#,##0.00
+		lineageTag: c9d0e1f2-3456-789a-bcde-f0123456789a
+
+	/// Number of closing member banks for the selected financial year
+	measure 'FY Closing Bank Count' = MAX(FinancialYearMetrics[closing_bank_count])
+		formatString: #,##0
+		lineageTag: d0e1f2a3-4567-89ab-cdef-0123456789ab
+
+	/// Number of opening member banks for the selected financial year
+	measure 'FY Opening Bank Count' = MIN(FinancialYearMetrics[opening_bank_count])
+		formatString: #,##0
+		lineageTag: e1f2a3b4-5678-9abc-def0-123456789abc
+
+	/// Number of months available for the selected financial year (12 for full years, 6 for incomplete FY 2026-27)
+	measure 'FY Months Available' = MAX(FinancialYearMetrics[months_available])
+		formatString: #,##0
+		lineageTag: f2a3b4c5-6789-abcd-ef01-23456789abcd
+	/// Annual Scorecard volume: shows latest complete FY 2025-26 when unfiltered, or the selected financial year
+	measure 'Scorecard FY Volume (Bn)' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    [FY Volume (Bn)],
+			    CALCULATE([FY Volume (Bn)], DimFinancialYear[FinancialYear] = "2025-26")
+			)
+		formatString: #,##0.00
+		lineageTag: a1b2c3d4-score-vol1-9abc-def012345678
+
+	/// Annual Scorecard value in lakh crore INR: shows latest complete FY 2025-26 when unfiltered, or the selected financial year
+	measure 'Scorecard FY Value (Lakh Cr INR)' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    [FY Value (Lakh Cr INR)],
+			    CALCULATE([FY Value (Lakh Cr INR)], DimFinancialYear[FinancialYear] = "2025-26")
+			)
+		formatString: #,##0.00
+		lineageTag: b2c3d4e5-score-val2-abcd-ef0123456789
+
+	/// Annual Scorecard weighted ticket size: shows latest complete FY 2025-26 when unfiltered, or the selected financial year
+	measure 'Scorecard FY Weighted Avg Ticket Size (INR)' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    [FY Weighted Avg Ticket Size (INR)],
+			    CALCULATE([FY Weighted Avg Ticket Size (INR)], DimFinancialYear[FinancialYear] = "2025-26")
+			)
+		formatString: ₹#,##0.00
+		lineageTag: c3d4e5f6-score-tkt3-bcde-f0123456789a
+
+	/// Annual Scorecard closing bank count: shows latest complete FY 2025-26 (705) when unfiltered, or the selected financial year
+	measure 'Scorecard FY Closing Bank Count' =
+			IF(
+			    HASONEVALUE(DimFinancialYear[FinancialYear]),
+			    [FY Closing Bank Count],
+			    CALCULATE([FY Closing Bank Count], DimFinancialYear[FinancialYear] = "2025-26")
+			)
+		formatString: #,##0
+		lineageTag: d4e5f6a7-score-bnk4-cdef-0123456789ab
+

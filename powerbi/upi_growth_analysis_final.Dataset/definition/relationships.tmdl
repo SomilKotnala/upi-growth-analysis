@@ -1,0 +1,17 @@
+relationship DimDate_MonthlyMetrics
+	fromColumn: MonthlyMetrics.month
+	toColumn: DimDate.Date
+
+relationship DimFinancialYear_DimDate
+	fromColumn: DimDate.FinancialYear
+	toColumn: DimFinancialYear.FinancialYear
+
+relationship DimFinancialYear_FinancialYearMetrics
+	fromColumn: FinancialYearMetrics.fy_label
+	toColumn: DimFinancialYear.FinancialYear
+
+relationship adabd1a9-a3f5-41e3-814a-32bef62d0f82
+	joinOnDateBehavior: datePartOnly
+	fromColumn: DimDate.Date
+	toColumn: LocalDateTable_3a2b7727-66ad-4454-add1-2c26223dcc8e.Date
+

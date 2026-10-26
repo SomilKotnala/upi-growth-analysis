@@ -1,0 +1,94 @@
+# ==============================================================================
+# UPI Growth Analysis — GitHub .gitignore Configuration
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing & coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local environment variables & secrets
+.env
+*.env
+*.local
+PGPASSWORD*
+
+# IDE & Editor metadata
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Temporary & intermediate data files
+*.tmp
+*.tmp.csv
+*.crdownload
+~$*.xlsx
+
+# Local backups & diagnostics
+backup/
+*.log
+
+# ------------------------------------------------------------------------------
+# Data Source & Processed Datasets (NPCI Data)
+# Retained locally; excluded from public distribution pending redistribution licensing.
+# Reproducible via: python src/clean_data.py & python src/analyze_trends.py
+# ------------------------------------------------------------------------------
+data/raw/*.xlsx
+data/processed/upi_monthly_clean.csv
+reports/python_eda/monthly_metrics.csv
+reports/python_eda/financial_year_metrics.csv
+
+# NPCI-derived chart visualizations (preserved locally; excluded pending clarification of reuse rights)
+reports/python_eda/*.png
+
+# ------------------------------------------------------------------------------
+# Power BI Local Backups, User Settings & Diagnostic Scripts
+# ------------------------------------------------------------------------------
+powerbi/backups/
+**/localSettings.json
+**/cache.abf
+*.pbix
+
+# Stage 5 reference project (retained locally as historical baseline; final project delivered)
+powerbi/upi_growth_analysis.pbip
+powerbi/upi_growth_analysis.Report/
+powerbi/upi_growth_analysis.Dataset/
+
+# Local Analysis Services diagnostic scripts referencing local Windows environment
+powerbi/audit_live_model.ps1
+powerbi/audit_model.ps1
+powerbi/check_live_instance.ps1
+
+# ------------------------------------------------------------------------------
+# Execution Runner Output Artifacts & Local Automation Scripts
+# ------------------------------------------------------------------------------
+fy_metrics_result.json
+pg_load_result.json
+sql_metrics_result.json
+
+# Ephemeral runtime scripts & local download tools
+download_all.py
+inspect_data.py
+test_cdp.py
+src/test_all_fy_filters.ps1
+src/run_adomd_query.ps1
+src/verify_all_fy_filters.py
+tests/check_button_states.py

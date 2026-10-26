@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "upi_growth_analysis_final"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "0fa501e4-ec95-4776-882c-fe4e02fe04b5"
+  }
+}

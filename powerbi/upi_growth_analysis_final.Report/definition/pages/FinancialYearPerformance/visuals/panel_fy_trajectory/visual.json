@@ -1,0 +1,256 @@
+{
+  "name": "panel_fy_trajectory",
+  "position": {
+    "x": 924,
+    "y": 424,
+    "z": 4100,
+    "height": 234,
+    "width": 332,
+    "tabOrder": 4100
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "H1 MOMENTUM vs FULL-YEAR BASELINE\n",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "8.5pt",
+                      "fontWeight": "bold",
+                      "color": "#2DD4BF"
+                    }
+                  },
+                  {
+                    "value": "\u2022 Volume Pace: ",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "8pt",
+                      "color": "#F3F6FC"
+                    }
+                  },
+                  {
+                    "value": "FY 26\u201327 H1 (140.50 Bn) delivered 58.1% of FY 25\u201326 full-year peak (241.62 Bn) in just 6 months.\n",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "8pt",
+                      "color": "#CBD5E1"
+                    }
+                  },
+                  {
+                    "value": "\u2022 Value Velocity: ",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "8pt",
+                      "color": "#F3F6FC"
+                    }
+                  },
+                  {
+                    "value": "H1 value reached \u20b9176.93 Lakh Cr (56.3% of FY 25\u201326 full-year \u20b9314.23L Cr).\n",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "8pt",
+                      "color": "#CBD5E1"
+                    }
+                  },
+                  {
+                    "value": "\u2022 Ticket Size Drift: ",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "8pt",
+                      "color": "#F3F6FC"
+                    }
+                  },
+                  {
+                    "value": "Weighted ticket moderated from \u20b91,300.54 (FY 25\u201326) to \u20b91,259.30 in H1 (-3.2%).\n",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "8pt",
+                      "color": "#CBD5E1"
+                    }
+                  },
+                  {
+                    "value": "\u2022 Member Banks: ",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontSize": "8pt",
+                      "color": "#F3F6FC"
+                    }
+                  },
+                  {
+                    "value": "Live banks grew from 705 (March 2026 close) to 756 in Sep 2026 (+51 banks added).",
+                    "textStyle": {
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "8pt",
+                      "color": "#CBD5E1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#131B2E'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1E293B'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "6D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'FISCAL TRAJECTORY ANALYSIS'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#F3F6FC'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'FY 2025\u201326 Baseline vs FY 2026\u201327 H1'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#CBD5E1'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json"
+}

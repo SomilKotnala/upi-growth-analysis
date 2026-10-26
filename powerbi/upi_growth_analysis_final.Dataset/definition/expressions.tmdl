@@ -1,0 +1,6 @@
+expression EdaDirectory = "D:\upi-growth-analysis\reports\python_eda" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e1d2a3b4-5678-9abc-def0-123456789abc
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text

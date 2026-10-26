@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "artifacts": [
+    {
+      "report": {
+        "path": "upi_growth_analysis_final.Report"
+      }
+    }
+  ],
+  "settings": {}
+}

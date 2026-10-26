@@ -1,0 +1,17 @@
+# Core Data Processing
+pandas==3.0.3
+
+# Excel File Reading Engine
+openpyxl==3.1.5
+
+# Numerical Computing
+numpy==2.4.6
+
+# Testing Framework
+pytest==9.0.3
+
+# PostgreSQL Database Driver
+psycopg2-binary==2.9.13
+
+# Visualization
+matplotlib==3.11.0

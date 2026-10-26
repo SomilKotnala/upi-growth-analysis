@@ -1,0 +1,81 @@
+table FinancialYearMetrics
+	lineageTag: 22f09ffe-3348-461e-94cf-bba5d6a9ba75
+
+	column fy_label
+		dataType: string
+		lineageTag: 2a7711be-08fc-473a-9db8-b921ef653d60
+		summarizeBy: none
+		sourceColumn: fy_label
+
+	column months_available
+		dataType: int64
+		formatString: #,##0
+		lineageTag: bb0fe4aa-4bec-4d48-b45d-d55acc52d1fa
+		summarizeBy: none
+		sourceColumn: months_available
+
+	column is_complete
+		dataType: boolean
+		lineageTag: d5c7c73b-387c-43f5-b67c-e4586924fad4
+		summarizeBy: none
+		sourceColumn: is_complete
+
+	column total_volume_mn
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 71d8ad7a-55ba-445e-b66c-65af35a0d046
+		summarizeBy: sum
+		sourceColumn: total_volume_mn
+
+	column total_value_cr
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: a239607d-0f26-4dcd-86b3-7d40fba3f12b
+		summarizeBy: sum
+		sourceColumn: total_value_cr
+
+	column weighted_avg_ticket_size_inr
+		dataType: double
+		formatString: ₹#,##0.00
+		lineageTag: 199a39bf-549a-4262-bca9-d998f22f03d7
+		summarizeBy: none
+		sourceColumn: weighted_avg_ticket_size_inr
+
+	column opening_bank_count
+		dataType: int64
+		formatString: #,##0
+		lineageTag: eb1fd4fe-c110-4146-8322-e1755358cc00
+		summarizeBy: none
+		sourceColumn: opening_bank_count
+
+	column closing_bank_count
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 85ca404a-7c1a-444b-b1bd-f9fa02d5ce6a
+		summarizeBy: none
+		sourceColumn: closing_bank_count
+
+	column yoy_volume_growth_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: 61798bd5-793b-49d5-9bd1-f4341b5a8a81
+		summarizeBy: none
+		sourceColumn: yoy_volume_growth_pct
+
+	column yoy_value_growth_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: 057e2ca1-d29c-4acf-b0b6-5cf2dccbd25f
+		summarizeBy: none
+		sourceColumn: yoy_value_growth_pct
+
+	partition FinancialYearMetrics-Partition = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(EdaDirectory & "\financial_year_metrics.csv"),[Delimiter=",", Columns=10, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"fy_label", type text}, {"months_available", Int64.Type}, {"is_complete", type logical}, {"total_volume_mn", type number}, {"total_value_cr", type number}, {"weighted_avg_ticket_size_inr", type number}, {"opening_bank_count", Int64.Type}, {"closing_bank_count", Int64.Type}, {"yoy_volume_growth_pct", type number}, {"yoy_value_growth_pct", type number}})
+				in
+				    #"Changed Type"
+

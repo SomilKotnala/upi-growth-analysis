@@ -1,0 +1,23 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["EdaDirectory","MonthlyMetrics","FinancialYearMetrics","DimDate","DimFinancialYear"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref expression EdaDirectory
+
+ref table MonthlyMetrics
+ref table FinancialYearMetrics
+ref table DimDate
+ref table DimFinancialYear
+ref table DateTableTemplate_ef7d923f-b6fb-4d3c-a016-2688a3a550cd
+ref table LocalDateTable_3a2b7727-66ad-4454-add1-2c26223dcc8e
+
