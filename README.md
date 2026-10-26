@@ -123,7 +123,7 @@ The underlying transaction statistics for this project are published by the **Na
 ### 2. Precautionary Exclusion Policy
 - **Excluded Assets:** All raw Excel workbooks (`data/raw/*.xlsx`), source-derived tabular datasets (`data/processed/upi_monthly_clean.csv`, `reports/python_eda/monthly_metrics.csv`, `reports/python_eda/financial_year_metrics.csv`), and generated chart images (`reports/python_eda/*.png`) are excluded from public distribution via `.gitignore` as a precaution because redistribution rights have not been established.
 - **Local Availability:** These files remain preserved and available locally to the project owner on disk.
-- **Open-Source Code:** The Python data processing pipelines (`src/clean_data.py`), PostgreSQL ingestion scripts (`src/load_to_postgres.py`), analytical SQL queries (`sql/*.sql`), visualization generation scripts (`src/analyze_trends.py`), DAX measure definitions, and Microsoft Fabric PBIR report metadata remain fully present in the repository to enable local reproduction from permitted source data.
+- **Project Source Code:** The Python data processing pipelines (`src/clean_data.py`), PostgreSQL ingestion scripts (`src/load_to_postgres.py`), analytical SQL queries (`sql/*.sql`), visualization generation scripts (`src/analyze_trends.py`), DAX measure definitions, and Microsoft Fabric PBIR report metadata remain fully present in the repository to enable local reproduction from permitted source data.
 - **Licensing Notice:** No open-data licence, public domain dedication, or redistribution permission from NPCI is claimed or implied. This precautionary exclusion is an operational compliance measure, not a formal legal determination regarding the copyrightability or redistributability of regulatory statistics or derived visualizations.
 
 ---
@@ -133,7 +133,7 @@ The underlying transaction statistics for this project are published by the **Na
 ### 1. Environment Setup
 Requires Python 3.10+ (tested on Python 3.14 on Windows).
 ```bash
-git clone https://github.com/<username>/upi-growth-analysis.git
+git clone https://github.com/SomilKotnala/upi-growth-analysis.git
 cd upi-growth-analysis
 
 python -m venv .venv
